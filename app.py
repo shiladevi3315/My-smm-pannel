@@ -120,7 +120,6 @@ def place_order():
     qty = int(request.form.get('quantity', 0))
     link = request.form.get('link')
     
-    # Find service rate
     rate = 80
     for s in services:
         if s['id'] == service_id:
@@ -134,7 +133,6 @@ def place_order():
         
     user_wallet -= cost
     
-    # Track Affiliate Spend simulation
     total_referred_spend += cost
     if total_referred_spend >= 500:
         affiliate_balance = total_referred_spend * 0.02
@@ -153,55 +151,70 @@ def add_funds():
     global user_wallet
     msg_html = ""
     if request.method == 'POST':
-        utr = request.form.get('utr').strip()
+        method = request.form.get('method')
+        amount_str = request.form.get('amount', '0')
+        ref_id = request.form.get('ref_id', '').strip()
+        
         try:
-            amount = float(request.form.get('amount', 0))
+            amount = float(amount_str)
         except ValueError:
             amount = 0.0
-        
-        if utr in used_utrs:
-            msg_html = "<div class='alert alert-danger'>❌ Error: This UTR has already been used for adding funds!</div>"
-        elif len(utr) != 12 or not utr.isdigit():
-            msg_html = "<div class='alert alert-danger'>❌ Invalid UTR! Transaction ID must be exactly 12 digits.</div>"
-        elif amount <= 0:
+
+        if amount <= 0:
             msg_html = "<div class='alert alert-danger'>❌ Please enter a valid payment amount.</div>"
+        elif not ref_id:
+            msg_html = "<div class='alert alert-danger'>❌ Transaction ID / UTR cannot be empty.</div>"
+        elif ref_id in used_utrs:
+            msg_html = "<div class='alert alert-danger'>❌ Error: This Transaction ID has already been used!</div>"
         else:
-            used_utrs.add(utr)
-            user_wallet += amount
-            msg_html = f"<div class='alert'>🎉 Success! ₹{amount:.2f} has been instantly added to your wallet.</div>"
+            if method == "upi" and (len(ref_id) != 12 or not ref_id.isdigit()):
+                msg_html = "<div class='alert alert-danger'>❌ Invalid UPI UTR! Must be exactly 12 digits.</div>"
+            else:
+                used_utrs.add(ref_id)
+                user_wallet += amount
+                msg_html = f"<div class='alert'>🎉 Payment submitted! ₹{amount:.2f} credited instantly via {method.upper()}.</div>"
 
     upi_id = "shiladevi0445@nyes"
-    # Standard dynamic UPI QR generation via public API
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa={upi_id}%26pn=Boost%20SMM%20Panel"
 
     return render_template_string(f"""
     <!DOCTYPE html>
     <html>
-    <head><title>Add Funds - Instant Payment</title>{BASE_CSS}</head>
+    <head><title>Add Funds - Payment Gateway</title>{BASE_CSS}</head>
     <body>
         <div class="navbar">
             <a href="/" class="logo">🚀 Boost SMM</a>
             <div class="links"><a href="/">New Order</a><a href="/add-funds" class="active">Add Funds</a><a href="/child-panel">Child Panel</a></div>
         </div>
         <div class="container" style="text-align: center;">
-            <h2>💳 Add Funds (Instant Automation)</h2>
+            <h2>💳 Multi-Method Payment Gateway</h2>
             {msg_html}
-            <p style="color: #8a99ad; margin-bottom: 20px;">Scan QR code using Paytm, PhonePe, or Google Pay to complete payment.</p>
             
-            <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-                <img src="{qr_url}" alt="Payment QR Code" style="display:block;">
+            <div style="margin-bottom: 25px; background: #13141c; padding: 15px; border-radius: 8px; border: 1px solid #343746; text-align: left;">
+                <h4 style="margin: 0 0 10px 0; color: #00f2fe;">📋 Merchant Payment Addresses:</h4>
+                <p style="margin: 4px 0; font-size: 14px;"><strong>🇮🇳 UPI ID:</strong> {upi_id}</p>
+                <p style="margin: 4px 0; font-size: 14px;"><strong>🪙 USDT (TRC-20):</strong> TX7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+                <p style="margin: 4px 0; font-size: 14px;"><strong>🪙 USDT (BEP-20) & ETH:</strong> 0x7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+                <p style="margin: 4px 0; font-size: 14px;"><strong>🪙 BTC (Bitcoin):</strong> 1Axxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+            </div>
+
+            <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-bottom: 20px;">
+                <img src="{qr_url}" alt="UPI QR Code">
             </div>
             
-            <p style="font-size: 16px; font-weight: bold; color: #38ef7d; margin-top: 15px;">Official Merchant UPI ID: <span style="color:#fff;">{upi_id}</span></p>
-            
-            <hr style="border-color: #343746; margin: 30px 0;">
-            
             <form method="POST" style="text-align: left; max-width: 420px; margin: 0 auto;">
-                <label>Exact Amount Paid (₹):</label>
+                <label>Select Payment Method:</label>
+                <select name="method">
+                    <option value="upi">UPI (PhonePe/Paytm/GPay)</option>
+                    <option value="paypal">PayPal / Credit Card</option>
+                    <option value="crypto">Crypto (USDT TRC20/BEP20/BTC)</option>
+                </select>
+                
+                <label>Exact Amount Paid (₹ / $):</label>
                 <input type="number" step="any" name="amount" placeholder="e.g. 500" required>
                 
-                <label>12-Digit UTR / Transaction Number:</label>
-                <input type="text" name="utr" maxlength="12" placeholder="Enter 12 digit payment reference" required>
+                <label>Transaction ID / UTR Hash:</label>
+                <input type="text" name="ref_id" placeholder="Enter 12-digit UTR or TxID Hash" required>
                 
                 <button type="submit" class="btn">Verify & Credit Instantly</button>
             </form>
@@ -229,13 +242,11 @@ def child_panel():
             <div class="card">
                 <h3 style="margin-bottom:5px;">📅 Monthly Plan</h3>
                 <p style="font-size: 26px; font-weight: bold; margin: 5px 0; color:#38ef7d;">₹{prices['child_panel_monthly']} <span style="font-size: 14px; color:#8a99ad; font-weight:normal;">/ Month</span></p>
-                <p style="color:#8a99ad; font-size:13px; margin:0;">Best for absolute beginners looking to try out.</p>
             </div>
             
             <div class="card" style="border-left-color: #38ef7d; background: linear-gradient(135deg, #13141c 0%, #1a2721 100%);">
                 <h3 style="margin-bottom:5px; color:#38ef7d;">🌟 Yearly Plan (Best Savings!)</h3>
                 <p style="font-size: 26px; font-weight: bold; margin: 5px 0; color:#00f2fe;">₹{prices['child_panel_yearly']} <span style="font-size: 14px; color:#8a99ad; font-weight:normal;">/ Year</span></p>
-                <p style="color: #38ef7d; font-size: 13px; font-weight: bold; margin:0;">🔥 Flat 15% Off Included! Saves huge money over monthly payments.</p>
             </div>
             
             <a href="{whatsapp_url}" target="_blank" class="btn btn-whatsapp">💬 Order via WhatsApp</a>
@@ -263,13 +274,10 @@ def affiliate():
         </div>
         <div class="container">
             <h2>🔗 Affiliate & Referral Program</h2>
-            <p style="color: #8a99ad;">Dosto ko refer karein aur unke har order spend par **2% commission** direct kamaayein.</p>
-            
             <div class="card">
                 <label>Your Unique Referral Link:</label>
                 <input type="text" value="https://boost-smm.onrender.com/?ref=user8376" readonly style="color:#00f2fe; font-weight:bold; cursor:pointer;">
             </div>
-
             <div class="card" style="border-left-color: {status_color};">
                 <h3>💰 Affiliate Wallet Balance: <span style="color:#38ef7d;">₹{affiliate_balance:.2f}</span></h3>
                 <p style="margin: 10px 0 5px;">Referral Total Spend Progress: <strong>₹{total_referred_spend:.2f} / ₹500.00</strong></p>
