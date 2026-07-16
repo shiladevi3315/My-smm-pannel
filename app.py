@@ -74,6 +74,7 @@ BASE_LAYOUT_START = """
         th { background-color: #13141c; color: #8a99ad; font-weight: 500; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: #282a36; color: #fff; text-transform: uppercase; }
         .badge-pending { background: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); }
+        .badge-success { background: rgba(56, 239, 125, 0.2); color: #38ef7d; border: 1px solid rgba(56, 239, 125, 0.3); }
 
         /* Fixed Premium Bottom Navigation Bar */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #13141c; height: 65px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #282a36; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); z-index: 1000; }
@@ -364,4 +365,4 @@ def admin_dashboard():
         prices['child_panel_monthly'] = int(request.form.get('monthly', prices['child_panel_monthly']))
         prices['child_panel_yearly'] = int(request.form.get('yearly', prices['child_panel_yearly']))
         
-    orders_html = "".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-success'>{o['status']}</span></td></tr>" for
+    orders_html = "".join([f"<tr><td>#{o['id']
