@@ -7,7 +7,7 @@ app.secret_key = 'boostsmm_final_mega_secret_key'
 ADMIN_USER = 'admin'
 ADMIN_PASS = 'admin123'
 
-# Global Data Storage (Temporary until Database integration)
+# Global Data Storage
 prices = {
     "child_panel_monthly": 749,
     "child_panel_yearly": 7639
@@ -27,7 +27,7 @@ user_wallet = 0.0
 affiliate_balance = 0.0
 total_referred_spend = 0.0
 
-# Premium Modern SMM Layout with Floating Elements & Bottom Navigation Bar
+# HTML Layouts without complex bracket formatting inside template strings
 BASE_LAYOUT_START = """
 <!DOCTYPE html>
 <html lang="en">
@@ -38,47 +38,31 @@ BASE_LAYOUT_START = """
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #0b0c10; margin: 0; padding-bottom: 80px; color: #ffffff; }
-        
-        /* Premium Floating Top Navbar */
         .top-navbar { background: linear-gradient(135deg, #1f2029 0%, #13141c 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #282a36; box-shadow: 0 4px 15px rgba(0,0,0,0.4); position: sticky; top: 0; z-index: 100; }
         .top-navbar .logo { font-size: 20px; font-weight: 700; color: #00f2fe; text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .top-navbar .user-profile { background: rgba(0, 242, 254, 0.1); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(0, 242, 254, 0.3); font-size: 13px; font-weight: 500; color: #00f2fe; }
-
         .container { max-width: 600px; margin: 25px auto; padding: 0 15px; box-sizing: border-box; }
-        
-        /* Premium Dashboard Widgets */
         .info-card { background: #1a1b24; padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #282a36; box-shadow: 0 8px 20px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
         .info-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: linear-gradient(to bottom, #0072ff, #00f2fe); }
         .info-card h3 { margin: 0 0 5px 0; font-size: 14px; color: #8a99ad; font-weight: 500; text-transform: uppercase; }
         .info-card .value { font-size: 28px; font-weight: 700; color: #38ef7d; }
-
         h2, h4 { color: #ffffff; font-weight: 600; margin-top: 0; margin-bottom: 15px; }
-        .accent-color { color: #00f2fe; }
-
-        /* Form Components */
         label { font-weight: 500; display: block; margin: 15px 0 6px; color: #8a99ad; font-size: 13px; }
-        select, input, textarea { width: 100%; padding: 14px; background: #13141c; border: 1px solid #282a36; border-radius: 10px; color: white; box-sizing: border-box; font-size: 14px; font-family: inherit; transition: all 0.3s; }
-        select:focus, input:focus, textarea:focus { border-color: #00f2fe; outline: none; box-shadow: 0 0 10px rgba(0,242,254,0.2); }
-        
-        .btn { background: linear-gradient(45deg, #0072ff, #00f2fe); color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: 600; text-align: center; text-decoration: none; display: block; box-sizing: border-box; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,114,255,0.3); }
-        .btn:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,114,255,0.4); }
-        .btn-whatsapp { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 15px rgba(56,239,125,0.3); }
-
+        select, input, textarea { width: 100%; padding: 14px; background: #13141c; border: 1px solid #282a36; border-radius: 10px; color: white; box-sizing: border-box; font-size: 14px; font-family: inherit; }
+        select:focus, input:focus, textarea:focus { border-color: #00f2fe; outline: none; }
+        .btn { background: linear-gradient(45deg, #0072ff, #00f2fe); color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: 600; text-align: center; text-decoration: none; display: block; box-sizing: border-box; }
+        .btn-whatsapp { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .alert { background-color: rgba(56, 239, 125, 0.15); color: #38ef7d; padding: 14px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; border: 1px solid rgba(56, 239, 125, 0.3); font-size: 14px; }
         .alert-danger { background-color: rgba(244, 67, 54, 0.15); color: #f44336; border-color: rgba(244, 67, 54, 0.3); }
-
-        /* Modern Table Styling */
         .table-wrapper { background: #1a1b24; border-radius: 14px; border: 1px solid #282a36; overflow: hidden; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #282a36; font-size: 13px; }
-        th { background-color: #13141c; color: #8a99ad; font-weight: 500; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        th { background-color: #13141c; color: #8a99ad; font-weight: 500; text-transform: uppercase; font-size: 11px; }
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: #282a36; color: #fff; text-transform: uppercase; }
-        .badge-pending { background: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); }
-        .badge-success { background: rgba(56, 239, 125, 0.2); color: #38ef7d; border: 1px solid rgba(56, 239, 125, 0.3); }
-
-        /* Fixed Premium Bottom Navigation Bar */
+        .badge-pending { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+        .badge-success { background: rgba(56, 239, 125, 0.2); color: #38ef7d; }
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #13141c; height: 65px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #282a36; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); z-index: 1000; }
-        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a99ad; text-decoration: none; font-size: 11px; font-weight: 500; transition: 0.3s; flex: 1; height: 100%; gap: 4px; }
+        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a99ad; text-decoration: none; font-size: 11px; font-weight: 500; flex: 1; height: 100%; gap: 4px; }
         .bottom-nav-item.active { color: #00f2fe; }
         .bottom-nav-item svg { width: 22px; height: 22px; fill: currentColor; }
     </style>
@@ -94,23 +78,23 @@ BASE_LAYOUT_START = """
 BASE_LAYOUT_END = """
     </div>
     <div class="bottom-nav">
-        <a href="/" class="bottom-nav-item {{ 'active' if active_page == 'order' else '' }}">
+        <a href="/" class="bottom-nav-item {% if active_page == 'order' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             New Order
         </a>
-        <a href="/add-funds" class="bottom-nav-item {{ 'active' if active_page == 'funds' else '' }}">
+        <a href="/add-funds" class="bottom-nav-item {% if active_page == 'funds' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
             Top Up
         </a>
-        <a href="/child-panel" class="bottom-nav-item {{ 'active' if active_page == 'child' else '' }}">
+        <a href="/child-panel" class="bottom-nav-item {% if active_page == 'child' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
             Child Panel
         </a>
-        <a href="/affiliate" class="bottom-nav-item {{ 'active' if active_page == 'affiliate' else '' }}">
+        <a href="/affiliate" class="bottom-nav-item {% if active_page == 'affiliate' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
             Affiliate
         </a>
-        <a href="/tickets" class="bottom-nav-item {{ 'active' if active_page == 'tickets' else '' }}">
+        <a href="/tickets" class="bottom-nav-item {% if active_page == 'tickets' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
             Support
         </a>
@@ -126,21 +110,29 @@ def user_dashboard():
     alert_html = ""
     if msg:
         css_class = "alert alert-danger" if msg_type == "danger" else "alert"
-        alert_html = f"<div class='{css_class}'>{msg}</div>"
+        alert_html = "<div class='" + css_class + "'>" + msg + "</div>"
 
-    content = f"""
-    {alert_html}
+    options = ""
+    for s in services:
+        options += "<option value='" + str(s['id']) + "'>" + s['name'] + " - ₹" + str(s['rate']) + "/k</option>"
+
+    rows = ""
+    if orders:
+        for o in orders[::-1]:
+            rows += "<tr><td>#" + str(o['id']) + "</td><td>" + o['link'] + "</td><td>" + str(o['quantity']) + "</td><td><span class='badge badge-pending'>" + o['status'] + "</span></td></tr>"
+    else:
+        rows = "<tr><td colspan='4' style='text-align:center; color:#8a99ad; padding:20px;'>No orders recorded yet.</td></tr>"
+
+    content = alert_html + """
     <div class="info-card">
         <h3>⚡ Wallet Balance</h3>
-        <div class="value">₹{user_wallet:.2f}</div>
+        <div class="value">₹""" + f"{user_wallet:.2f}" + """</div>
     </div>
     
     <h2>📦 Place New Order</h2>
     <form action="/place-order" method="POST">
         <label>Category Services:</label>
-        <select name="service_id">
-            {"".join([f"<option value='{s['id']}'>{s['name']} - ₹{s['rate']}/k</option>" for s in services])}
-        </select>
+        <select name="service_id">""" + options + """</select>
         
         <label>Link / Target URL:</label>
         <input type="text" name="link" placeholder="e.g. https://instagram.com/profile" required>
@@ -157,9 +149,7 @@ def user_dashboard():
             <thead>
                 <tr><th>ID</th><th>Target URL</th><th>Qty</th><th>Status</th></tr>
             </thead>
-            <tbody>
-                {"".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-pending'>{o['status']}</span></td></tr>" for o in orders[::-1]]) if orders else "<tr><td colspan='4' style='text-align:center; color:#8a99ad; padding:20px;'>No orders recorded yet.</td></tr>"}
-            </tbody>
+            <tbody>""" + rows + """</tbody>
         </table>
     </div>
     """
@@ -195,7 +185,7 @@ def place_order():
         "quantity": qty,
         "status": "Pending"
     })
-    return redirect(url_for('user_dashboard', msg=f"🎉 Order #{order_id} successfully queued!"))
+    return redirect(url_for('user_dashboard', msg="🎉 Order #" + str(order_id) + " successfully queued!"))
 
 @app.route('/add-funds', methods=['GET', 'POST'])
 def add_funds():
@@ -223,24 +213,21 @@ def add_funds():
             else:
                 used_utrs.add(ref_id)
                 user_wallet += amount
-                msg_html = f"<div class='alert'>🎉 Payment verified! Instantly credited ₹{amount:.2f} via {method.upper()}.</div>"
+                msg_html = "<div class='alert'>🎉 Payment verified! Instantly credited ₹" + f"{amount:.2f}" + " via " + method.upper() + ".</div>"
 
     upi_id = "shiladevi0445@nyes"
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa={upi_id}%26pn=Boost%20SMM%20Panel"
+    qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=" + upi_id + "%26pn=Boost%20SMM%20Panel"
 
-    content = f"""
-    <h2>💳 Automatic Fund Injection</h2>
-    {msg_html}
-    
+    content = "<h2>💳 Automatic Fund Injection</h2>" + msg_html + """
     <div style="background: #1a1b24; padding: 15px; border-radius: 12px; border: 1px solid #282a36; text-align: left; margin-bottom: 20px;">
         <h4 style="margin: 0 0 10px 0; color: #00f2fe;">🪙 Multi-Currency Vault Gateways:</h4>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>🇮🇳 Fast UPI Address:</strong> {upi_id}</p>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>🇮🇳 Fast UPI Address:</strong> """ + upi_id + """</p>
         <p style="margin: 4px 0; font-size: 13px;"><strong>🟢 USDT (TRC-20 Network):</strong> TX7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
         <p style="margin: 4px 0; font-size: 13px;"><strong>🔵 USDT (BEP-20 / Smart Chain):</strong> 0x7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
     </div>
 
     <div style="background: white; padding: 15px; display: inline-block; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); margin-bottom: 25px;">
-        <img src="{qr_url}" alt="Gateway QR Code" style="display:block;">
+        <img src="""" + qr_url + """" alt="Gateway QR Code" style="display:block;">
     </div>
     
     <form method="POST" style="text-align: left;">
@@ -265,22 +252,22 @@ def add_funds():
 @app.route('/child-panel')
 def child_panel():
     whatsapp_url = "https://wa.me/918376820445?text=I%20need%20child%20pannel"
-    content = f"""
+    content = """
     <h2>🛠️ White-Label Reseller Platform (Child Panel)</h2>
     <p style="color: #8a99ad; margin-bottom: 25px; font-size: 14px;">Establish your independent customized SMM identity linked directly to our automated pipeline.</p>
     
     <div class="info-card" style="margin-bottom: 15px;">
         <h3 style="color: #38ef7d;">📅 Regular Rolling Plan</h3>
-        <div class="value" style="color: #ffffff; font-size: 24px;">₹{prices['child_panel_monthly']}<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Month</span></div>
+        <div class="value" style="color: #ffffff; font-size: 24px;">₹""" + str(prices['child_panel_monthly']) + """<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Month</span></div>
     </div>
     
     <div class="info-card" style="background: linear-gradient(135deg, #1a1b24 0%, #152722 100%); border-color: #38ef7d;">
         <h3 style="color: #00f2fe;">🌟 Infinite Annual Engine</h3>
-        <div class="value" style="color: #38ef7d; font-size: 24px;">₹{prices['child_panel_yearly']}<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Year</span></div>
+        <div class="value" style="color: #38ef7d; font-size: 24px;">₹""" + str(prices['child_panel_yearly']) + """<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Year</span></div>
         <p style="color: #38ef7d; font-size: 12px; font-weight: 600; margin: 8px 0 0 0;">🔥 Flat 15% System Discount Built-in!</p>
     </div>
     
-    <a href="{whatsapp_url}" target="_blank" class="btn btn-whatsapp">💬 Synchronize via WhatsApp</a>
+    <a href="""" + whatsapp_url + """" target="_blank" class="btn btn-whatsapp">💬 Synchronize via WhatsApp</a>
     """
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='child')
 
@@ -292,7 +279,7 @@ def affiliate():
         status_msg = "🔓 Unlocked & Processing (2% Pipelined Commission Active)"
         status_color = "#38ef7d"
         
-    content = f"""
+    content = """
     <h2>👥 Performance Affiliate Node</h2>
     <p style="color: #8a99ad; font-size: 14px;">Distribute your dedicated referral token and absorb a rolling 2% processing revenue cut on global client spending.</p>
     
@@ -301,11 +288,11 @@ def affiliate():
         <input type="text" value="https://boostsmm.onrender.com/?ref=abhiahek3376" readonly style="color:#00f2fe; font-weight:600; cursor:pointer; background:#13141c; text-align:center;">
     </div>
     
-    <div class="info-card" style="border-left-color: {status_color};">
+    <div class="info-card" style="border-left-color: """ + status_color + """;">
         <h3>💰 Vault Ledger Revenue</h3>
-        <div class="value" style="color: #38ef7d; margin-bottom: 10px;">₹{affiliate_balance:.2f}</div>
-        <p style="margin: 5px 0; font-size:13px;">Pipelined Spend Volume: <strong>₹{total_referred_spend:.2f} / ₹500.00</strong></p>
-        <p style="margin: 0; font-size:12px; color: {status_color}; font-weight:600;">System Check: {status_msg}</p>
+        <div class="value" style="color: #38ef7d; margin-bottom: 10px;">₹""" + f"{affiliate_balance:.2f}" + """</div>
+        <p style="margin: 5px 0; font-size:13px;">Pipelined Spend Volume: <strong>₹""" + f"{total_referred_spend:.2f}" + """ / ₹500.00</strong></p>
+        <p style="margin: 0; font-size:12px; color: """ + status_color + """; font-weight:600;">System Check: """ + status_msg + """</p>
     </div>
     """
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='affiliate')
@@ -321,9 +308,11 @@ def tickets_page():
             "msg": message,
             "reply": "System Route: Forwarded to Admin Cluster Review."
         })
-    tickets_html = "".join([f"<div class='info-card'><h4>📌 Ticket #{t['id']}: {t['subject']}</h4><p style='color:#ccc; font-size:13px; margin:5px 0;'>{t['msg']}</p><p style='color: #00f2fe; margin:5px 0 0; font-size:12px; font-weight:600;'>💬 Node Reply: {t['reply']}</p></div>" for t in tickets[::-1]])
+    tickets_html = ""
+    for t in tickets[::-1]:
+        tickets_html += "<div class='info-card'><h4>📌 Ticket #" + str(t['id']) + ": " + t['subject'] + "</h4><p style='color:#ccc; font-size:13px; margin:5px 0;'>" + t['msg'] + "</p><p style='color: #00f2fe; margin:5px 0 0; font-size:12px; font-weight:600;'>💬 Node Reply: " + t['reply'] + "</p></div>"
     
-    content = f"""
+    content = """
     <h2>📩 Encrypted Support Desk</h2>
     <form method="POST">
         <label>Node Issue Context:</label>
@@ -336,8 +325,7 @@ def tickets_page():
     </form>
     <hr style='margin: 30px 0; border: none; border-top: 1px solid #282a36;'>
     <h2>📜 Historical Logs</h2>
-    {tickets_html if tickets else "<p style='color:#8a99ad; font-size:13px;'>No communications records registered.</p>"}
-    """
+    """ + (tickets_html if tickets else "<p style='color:#8a99ad; font-size:13px;'>No communications records registered.</p>")
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='tickets')
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -346,23 +334,25 @@ def admin_login():
         if request.form.get('username') == ADMIN_USER and request.form.get('password') == ADMIN_PASS:
             session['admin_logged'] = True
             return redirect(url_for('admin_dashboard'))
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html><head><title>Secure Login</title>{BASE_LAYOUT_START}</head><body><div class="container" style="max-width:400px; margin-top:80px;">
+    return render_template_string(BASE_LAYOUT_START + """
         <h2>🔐 Control Module</h2>
         <form method="POST">
             <label>Master Username:</label><input type="text" name="username" required>
             <label>Master Password:</label><input type="password" name="password" required>
             <button type="submit" class="btn">Initialize Node</button>
         </form>
-    </div></body></html>
-    """)
+    """ + BASE_LAYOUT_END, active_page='admin')
 
 @app.route('/admin/dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    if not session.get('admin_logged'): return redirect(url_for('admin_login'))
+    if not session.get('admin_logged'): 
+        return redirect(url_for('admin_login'))
     if request.method == 'POST':
         prices['child_panel_monthly'] = int(request.form.get('monthly', prices['child_panel_monthly']))
         prices['child_panel_yearly'] = int(request.form.get('yearly', prices['child_panel_yearly']))
         
-    orders_html = "".join([f"<tr><td>#{o['id']
+    orders_html = ""
+    for o in orders:
+        orders_html += "<tr><td>#" + str(o['id']) + "</td><td>" + o['link'] + "</td><td>" + str(o['quantity']) + "</td><td><span class='badge badge-success'>" + o['status'] + "</span></td></tr>"
+        
+    content = "<h2>⚙️ Adjust Rolling Multipliers</h2><form method='POST'><label>Dynamic Monthly Fee (₹):</label><input type='number' name='monthly' value='" + str(prices['child_panel_monthly']) + "'><label>Dynamic Annual Fee (₹):</label><input type='number' name='yearly' value='" + str(prices['child_panel_yearly']) + "'><butt
