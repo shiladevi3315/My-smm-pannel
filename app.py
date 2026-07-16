@@ -27,7 +27,6 @@ user_wallet = 0.0
 affiliate_balance = 0.0
 total_referred_spend = 0.0
 
-# HTML Layouts without complex bracket formatting inside template strings
 BASE_LAYOUT_START = """
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +48,6 @@ BASE_LAYOUT_START = """
         h2, h4 { color: #ffffff; font-weight: 600; margin-top: 0; margin-bottom: 15px; }
         label { font-weight: 500; display: block; margin: 15px 0 6px; color: #8a99ad; font-size: 13px; }
         select, input, textarea { width: 100%; padding: 14px; background: #13141c; border: 1px solid #282a36; border-radius: 10px; color: white; box-sizing: border-box; font-size: 14px; font-family: inherit; }
-        select:focus, input:focus, textarea:focus { border-color: #00f2fe; outline: none; }
         .btn { background: linear-gradient(45deg, #0072ff, #00f2fe); color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: 600; text-align: center; text-decoration: none; display: block; box-sizing: border-box; }
         .btn-whatsapp { background: linear-gradient(45deg, #11998e, #38ef7d); }
         .alert { background-color: rgba(56, 239, 125, 0.15); color: #38ef7d; padding: 14px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; border: 1px solid rgba(56, 239, 125, 0.3); font-size: 14px; }
@@ -110,46 +108,40 @@ def user_dashboard():
     alert_html = ""
     if msg:
         css_class = "alert alert-danger" if msg_type == "danger" else "alert"
-        alert_html = "<div class='" + css_class + "'>" + msg + "</div>"
+        alert_html = f"<div class='{css_class}'>{msg}</div>"
 
-    options = ""
-    for s in services:
-        options += "<option value='" + str(s['id']) + "'>" + s['name'] + " - ₹" + str(s['rate']) + "/k</option>"
-
+    options = "".join([f"<option value='{s['id']}'>{s['name']} - ₹{s['rate']}/k</option>" for s in services])
+    
     rows = ""
     if orders:
         for o in orders[::-1]:
-            rows += "<tr><td>#" + str(o['id']) + "</td><td>" + o['link'] + "</td><td>" + str(o['quantity']) + "</td><td><span class='badge badge-pending'>" + o['status'] + "</span></td></tr>"
+            rows += f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-pending'>{o['status']}</span></td></tr>"
     else:
         rows = "<tr><td colspan='4' style='text-align:center; color:#8a99ad; padding:20px;'>No orders recorded yet.</td></tr>"
 
-    content = alert_html + """
+    content = f"""
+    {alert_html}
     <div class="info-card">
         <h3>⚡ Wallet Balance</h3>
-        <div class="value">₹""" + f"{user_wallet:.2f}" + """</div>
+        <div class="value">₹{user_wallet:.2f}</div>
     </div>
-    
     <h2>📦 Place New Order</h2>
     <form action="/place-order" method="POST">
         <label>Category Services:</label>
-        <select name="service_id">""" + options + """</select>
-        
+        <select name="service_id">{options}</select>
         <label>Link / Target URL:</label>
         <input type="text" name="link" placeholder="e.g. https://instagram.com/profile" required>
-        
         <label>Quantity:</label>
         <input type="number" name="quantity" min="100" placeholder="Min: 100" required>
-        
         <button type="submit" class="btn">New Order</button>
     </form>
-    
     <h2 style="margin-top: 35px;">📋 Recent Transaction Logs</h2>
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr><th>ID</th><th>Target URL</th><th>Qty</th><th>Status</th></tr>
             </thead>
-            <tbody>""" + rows + """</tbody>
+            <tbody>{rows}</tbody>
         </table>
     </div>
     """
@@ -171,7 +163,7 @@ def place_order():
     cost = (qty / 1000) * rate
     
     if user_wallet < cost:
-        return redirect(url_for('user_dashboard', msg="Insufficient Wallet Funds! Please add money.", type="danger"))
+        return redirect(url_for('user_dashboard', msg="Insufficient Wallet Funds!", type="danger"))
         
     user_wallet -= cost
     total_referred_spend += cost
@@ -179,13 +171,8 @@ def place_order():
         affiliate_balance = total_referred_spend * 0.02
 
     order_id = len(orders) + 1001
-    orders.append({
-        "id": order_id,
-        "link": link,
-        "quantity": qty,
-        "status": "Pending"
-    })
-    return redirect(url_for('user_dashboard', msg="🎉 Order #" + str(order_id) + " successfully queued!"))
+    orders.append({"id": order_id, "link": link, "quantity": qty, "status": "Pending"})
+    return redirect(url_for('user_dashboard', msg=f"🎉 Order #{order_id} successfully queued!"))
 
 @app.route('/add-funds', methods=['GET', 'POST'])
 def add_funds():
@@ -204,47 +191,34 @@ def add_funds():
         if amount <= 0:
             msg_html = "<div class='alert alert-danger'>❌ Please input a valid deposit amount.</div>"
         elif not ref_id:
-            msg_html = "<div class='alert alert-danger'>❌ Transaction ID reference hash required.</div>"
+            msg_html = "<div class='alert alert-danger'>❌ Transaction ID hash required.</div>"
         elif ref_id in used_utrs:
-            msg_html = "<div class='alert alert-danger'>❌ Error: Duplicate Transaction ID detected!</div>"
+            msg_html = "<div class='alert alert-danger'>❌ Error: Duplicate ID detected!</div>"
         else:
-            if method == "upi" and (len(ref_id) != 12 or not ref_id.isdigit()):
-                msg_html = "<div class='alert alert-danger'>❌ Invalid UTR structural signature. Must be 12 digits.</div>"
-            else:
-                used_utrs.add(ref_id)
-                user_wallet += amount
-                msg_html = "<div class='alert'>🎉 Payment verified! Instantly credited ₹" + f"{amount:.2f}" + " via " + method.upper() + ".</div>"
+            used_utrs.add(ref_id)
+            user_wallet += amount
+            msg_html = f"<div class='alert'>🎉 Verified! Credited ₹{amount:.2f} via {method.upper()}.</div>"
 
     upi_id = "shiladevi0445@nyes"
-    qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=" + upi_id + "%26pn=Boost%20SMM%20Panel"
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa={upi_id}%26pn=BoostSMM"
 
-    content = "<h2>💳 Automatic Fund Injection</h2>" + msg_html + """
-    <div style="background: #1a1b24; padding: 15px; border-radius: 12px; border: 1px solid #282a36; text-align: left; margin-bottom: 20px;">
-        <h4 style="margin: 0 0 10px 0; color: #00f2fe;">🪙 Multi-Currency Vault Gateways:</h4>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>🇮🇳 Fast UPI Address:</strong> """ + upi_id + """</p>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>🟢 USDT (TRC-20 Network):</strong> TX7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
-        <p style="margin: 4px 0; font-size: 13px;"><strong>🔵 USDT (BEP-20 / Smart Chain):</strong> 0x7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+    content = f"""
+    <h2>💳 Fund Injection</h2>
+    {msg_html}
+    <div style="background: #1a1b24; padding: 15px; border-radius: 12px; border: 1px solid #282a36; margin-bottom: 20px;">
+        <p><strong>🇮🇳 UPI Address:</strong> {upi_id}</p>
     </div>
-
-    <div style="background: white; padding: 15px; display: inline-block; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); margin-bottom: 25px;">
-        <img src="""" + qr_url + """" alt="Gateway QR Code" style="display:block;">
+    <div style="background: white; padding: 15px; display: inline-block; border-radius: 12px; margin-bottom: 25px;">
+        <img src="{qr_url}" alt="QR">
     </div>
-    
-    <form method="POST" style="text-align: left;">
-        <label>Deposit Network Engine:</label>
-        <select name="method">
-            <option value="upi">PhonePe-Paytm (India Only) - Instant</option>
-            <option value="paypal">PayPal Gateway / International Card</option>
-            <option value="crypto">Crypto Network Cascade (USDT / BTC)</option>
-        </select>
-        
-        <label>Exact Transaction Amount:</label>
-        <input type="number" step="any" name="amount" placeholder="e.g. 500" required>
-        
-        <label>UTR Reference ID / TxID String:</label>
-        <input type="text" name="ref_id" placeholder="Enter 12-digit UTR or Payment ID" required>
-        
-        <button type="submit" class="btn">Verify & Load Wallet</button>
+    <form method="POST">
+        <label>Engine:</label>
+        <select name="method"><option value="upi">UPI - Instant</option></select>
+        <label>Amount:</label>
+        <input type="number" step="any" name="amount" required>
+        <label>UTR ID:</label>
+        <input type="text" name="ref_id" required>
+        <button type="submit" class="btn">Verify & Load</button>
     </form>
     """
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='funds')
@@ -252,96 +226,37 @@ def add_funds():
 @app.route('/child-panel')
 def child_panel():
     whatsapp_url = "https://wa.me/918376820445?text=I%20need%20child%20pannel"
-    content = """
-    <h2>🛠️ White-Label Reseller Platform (Child Panel)</h2>
-    <p style="color: #8a99ad; margin-bottom: 25px; font-size: 14px;">Establish your independent customized SMM identity linked directly to our automated pipeline.</p>
-    
-    <div class="info-card" style="margin-bottom: 15px;">
-        <h3 style="color: #38ef7d;">📅 Regular Rolling Plan</h3>
-        <div class="value" style="color: #ffffff; font-size: 24px;">₹""" + str(prices['child_panel_monthly']) + """<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Month</span></div>
-    </div>
-    
-    <div class="info-card" style="background: linear-gradient(135deg, #1a1b24 0%, #152722 100%); border-color: #38ef7d;">
-        <h3 style="color: #00f2fe;">🌟 Infinite Annual Engine</h3>
-        <div class="value" style="color: #38ef7d; font-size: 24px;">₹""" + str(prices['child_panel_yearly']) + """<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Year</span></div>
-        <p style="color: #38ef7d; font-size: 12px; font-weight: 600; margin: 8px 0 0 0;">🔥 Flat 15% System Discount Built-in!</p>
-    </div>
-    
-    <a href="""" + whatsapp_url + """" target="_blank" class="btn btn-whatsapp">💬 Synchronize via WhatsApp</a>
+    content = f"""
+    <h2>🛠️ Child Panel</h2>
+    <div class="info-card"><h3>📅 Monthly</h3><div class="value">₹{prices['child_panel_monthly']}</div></div>
+    <div class="info-card"><h3>🌟 Annual</h3><div class="value">₹{prices['child_panel_yearly']}</div></div>
+    <a href="{whatsapp_url}" target="_blank" class="btn btn-whatsapp">💬 Sync via WhatsApp</a>
     """
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='child')
 
 @app.route('/affiliate')
 def affiliate():
-    status_msg = "🔒 Locked (Minimum referral trigger set at ₹500 spend threshold)"
-    status_color = "#ff9800"
-    if total_referred_spend >= 500:
-        status_msg = "🔓 Unlocked & Processing (2% Pipelined Commission Active)"
-        status_color = "#38ef7d"
-        
-    content = """
-    <h2>👥 Performance Affiliate Node</h2>
-    <p style="color: #8a99ad; font-size: 14px;">Distribute your dedicated referral token and absorb a rolling 2% processing revenue cut on global client spending.</p>
-    
-    <div class="info-card">
-        <h3>🔗 Cryptographic Token Link</h3>
-        <input type="text" value="https://boostsmm.onrender.com/?ref=abhiahek3376" readonly style="color:#00f2fe; font-weight:600; cursor:pointer; background:#13141c; text-align:center;">
-    </div>
-    
-    <div class="info-card" style="border-left-color: """ + status_color + """;">
-        <h3>💰 Vault Ledger Revenue</h3>
-        <div class="value" style="color: #38ef7d; margin-bottom: 10px;">₹""" + f"{affiliate_balance:.2f}" + """</div>
-        <p style="margin: 5px 0; font-size:13px;">Pipelined Spend Volume: <strong>₹""" + f"{total_referred_spend:.2f}" + """ / ₹500.00</strong></p>
-        <p style="margin: 0; font-size:12px; color: """ + status_color + """; font-weight:600;">System Check: """ + status_msg + """</p>
-    </div>
+    status_msg = "🔒 Locked" if total_referred_spend < 500 else "🔓 Unlocked"
+    content = f"""
+    <h2>👥 Affiliate System</h2>
+    <div class="info-card"><h3>💰 Earnings</h3><div class="value">₹{affiliate_balance:.2f}</div><p>{status_msg}</p></div>
     """
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='affiliate')
 
 @app.route('/tickets', methods=['GET', 'POST'])
 def tickets_page():
     if request.method == 'POST':
-        subject = request.form.get('subject')
-        message = request.form.get('message')
-        tickets.append({
-            "id": len(tickets) + 1,
-            "subject": subject,
-            "msg": message,
-            "reply": "System Route: Forwarded to Admin Cluster Review."
-        })
-    tickets_html = ""
-    for t in tickets[::-1]:
-        tickets_html += "<div class='info-card'><h4>📌 Ticket #" + str(t['id']) + ": " + t['subject'] + "</h4><p style='color:#ccc; font-size:13px; margin:5px 0;'>" + t['msg'] + "</p><p style='color: #00f2fe; margin:5px 0 0; font-size:12px; font-weight:600;'>💬 Node Reply: " + t['reply'] + "</p></div>"
-    
-    content = """
-    <h2>📩 Encrypted Support Desk</h2>
-    <form method="POST">
-        <label>Node Issue Context:</label>
-        <input type="text" name="subject" placeholder="e.g. Transaction Routing Delay" required>
-        
-        <label>Extended Transmission Core:</label>
-        <textarea name="message" rows="4" placeholder="Describe the structural error or deployment context..." required></textarea>
-        
-        <button type="submit" class="btn">Transmit Core Ticket</button>
-    </form>
-    <hr style='margin: 30px 0; border: none; border-top: 1px solid #282a36;'>
-    <h2>📜 Historical Logs</h2>
-    """ + (tickets_html if tickets else "<p style='color:#8a99ad; font-size:13px;'>No communications records registered.</p>")
+        tickets.append({"id": len(tickets) + 1, "subject": request.form.get('subject'), "msg": request.form.get('message'), "reply": "Forwarded to Admin cluster."})
+    t_html = "".join([f"<div class='info-card'><h4>📌 #{t['id']} {t['subject']}</h4><p>{t['msg']}</p></div>" for t in tickets[::-1]])
+    content = f"<h2>📩 Support</h2><form method='POST'><label>Context:</label><input type='text' name='subject' required><label>Core:</label><textarea name='message' required></textarea><button type='submit' class='btn'>Submit</button></form><hr>{t_html}"
     return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='tickets')
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
-    if request.method == 'POST':
-        if request.form.get('username') == ADMIN_USER and request.form.get('password') == ADMIN_PASS:
-            session['admin_logged'] = True
-            return redirect(url_for('admin_dashboard'))
-    return render_template_string(BASE_LAYOUT_START + """
-        <h2>🔐 Control Module</h2>
-        <form method="POST">
-            <label>Master Username:</label><input type="text" name="username" required>
-            <label>Master Password:</label><input type="password" name="password" required>
-            <button type="submit" class="btn">Initialize Node</button>
-        </form>
-    """ + BASE_LAYOUT_END, active_page='admin')
+    if request.method == 'POST' and request.form.get('username') == ADMIN_USER and request.form.get('password') == ADMIN_PASS:
+        session['admin_logged'] = True
+        return redirect(url_for('admin_dashboard'))
+    return render_template_string(BASE_LAYOUT_START + "<h2>🔐 Control Module</h2><form method='POST'><label>User:</label><input type='text' name='username'><label>Pass:</label><input type='password' name='password'><button type='submit' class='btn'>Login</button></form>" + BASE_LAYOUT_END, active_page='admin')
 
 @app.route('/admin/dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
@@ -350,9 +265,10 @@ def admin_dashboard():
     if request.method == 'POST':
         prices['child_panel_monthly'] = int(request.form.get('monthly', prices['child_panel_monthly']))
         prices['child_panel_yearly'] = int(request.form.get('yearly', prices['child_panel_yearly']))
-        
-    orders_html = ""
-    for o in orders:
-        orders_html += "<tr><td>#" + str(o['id']) + "</td><td>" + o['link'] + "</td><td>" + str(o['quantity']) + "</td><td><span class='badge badge-success'>" + o['status'] + "</span></td></tr>"
-        
-    content = "<h2>⚙️ Adjust Rolling Multipliers</h2><form method='POST'><label>Dynamic Monthly Fee (₹):</label><input type='number' name='monthly' value='" + str(prices['child_panel_monthly']) + "'><label>Dynamic Annual Fee (₹):</label><input type='number' name='yearly' value='" + str(prices['child_panel_yearly']) + "'><butt
+    
+    orders_html = "".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td>{o['status']}</td></tr>" for o in orders])
+    content = f"<h2>⚙️ Admin Control Panel</h2><form method='POST'><input type='number' name='monthly' value='{prices['child_panel_monthly']}'><input type='number' name='yearly' value='{prices['child_panel_yearly']}'><button type='submit' class='btn'>Update Matrix</button></form><table>{orders_html}</table>"
+    return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='admin')
+
+if __name__ == '__main__':
+    app.run(debug=True)
