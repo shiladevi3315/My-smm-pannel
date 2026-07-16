@@ -7,52 +7,115 @@ app.secret_key = 'boostsmm_final_mega_secret_key'
 ADMIN_USER = 'admin'
 ADMIN_PASS = 'admin123'
 
-# Global Data Storage (Temporary until Database is added)
+# Global Data Storage (Temporary until Database integration)
 prices = {
     "child_panel_monthly": 749,
-    "child_panel_yearly": 7639  # 15% Discount on 12 * 749
+    "child_panel_yearly": 7639
 }
 
 services = [
-    {"id": 1, "name": "Instagram Followers [Non-Drop] [Best]", "rate": 80},
-    {"id": 2, "name": "Instagram Likes [Instant/Real]", "rate": 20},
-    {"id": 3, "name": "YouTube Views [High Quality]", "rate": 150},
-    {"id": 4, "name": "Telegram Members [Speedy]", "rate": 60}
+    {"id": 1, "name": "Instagram Followers [ALL Flags Work] [365 Days Refill]", "rate": 80},
+    {"id": 2, "name": "Instagram Video/Reel Views [1m/Day] [Cheapest]", "rate": 20},
+    {"id": 3, "name": "Facebook Video/Reel Views [0-30 Min] [30 Days Refill]", "rate": 150},
+    {"id": 4, "name": "Telegram Members [Speedy] [Non-Drop]", "rate": 60}
 ]
 
 orders = []
 tickets = []
-used_utrs = set()  # Duplicity check for UTR
+used_utrs = set()
 user_wallet = 0.0
 affiliate_balance = 0.0
 total_referred_spend = 0.0
 
-BASE_CSS = """
-<style>
-    body { font-family: 'Poppins', sans-serif; background-color: #0d0e15; margin: 0; padding: 0; color: #ffffff; }
-    .navbar { background-color: #1f2029; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #343746; }
-    .navbar .logo { font-size: 20px; font-weight: bold; color: #00f2fe; text-decoration: none; }
-    .navbar .links a { color: #8a99ad; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 14px; transition: 0.3s; }
-    .navbar .links a:hover, .navbar .links a.active { color: #00f2fe; }
-    .container { max-width: 750px; margin: 40px auto; background: #1f2029; padding: 30px; border-radius: 12px; border: 1px solid #343746; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-    h2, h3 { color: #00f2fe; margin-top: 0; font-weight: 600; }
-    label { font-weight: bold; display: block; margin: 15px 0 5px; color: #8a99ad; font-size: 14px; }
-    select, input, textarea { width: 100%; padding: 12px; background: #13141c; border: 1px solid #343746; border-radius: 6px; color: white; box-sizing: border-box; font-size: 14px; }
-    select:focus, input:focus, textarea:focus { border-color: #00f2fe; outline: none; }
-    .btn { background: linear-gradient(45deg, #0072ff, #00f2fe); color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 20px; font-weight: bold; text-align: center; text-decoration: none; display: block; box-sizing: border-box; transition: 0.3s; }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-whatsapp { background: linear-gradient(45deg, #11998e, #38ef7d); }
-    .card { background: #13141c; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00f2fe; }
-    .alert { background-color: #155724; color: #d4edda; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: bold; border: 1px solid #c3e6cb; }
-    .alert-danger { background-color: #721c24; color: #f8d7da; border-color: #f5c6cb; }
-    .wallet-box { background: #13141c; padding: 12px 20px; border-radius: 6px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #343746; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #13141c; border-radius: 8px; overflow: hidden; }
-    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #343746; font-size: 14px; }
-    th { background-color: #1a1b23; color: #8a99ad; font-weight: 600; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #343746; color: #fff; }
-    .badge-pending { background: #ff9800; }
-    .badge-success { background: #4caf50; }
-</style>
+# Premium Modern SMM Layout with Floating Elements & Bottom Navigation Bar
+BASE_LAYOUT_START = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoostSMM - SMM Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0b0c10; margin: 0; padding-bottom: 80px; color: #ffffff; }
+        
+        /* Premium Floating Top Navbar */
+        .top-navbar { background: linear-gradient(135deg, #1f2029 0%, #13141c 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #282a36; box-shadow: 0 4px 15px rgba(0,0,0,0.4); position: sticky; top: 0; z-index: 100; }
+        .top-navbar .logo { font-size: 20px; font-weight: 700; color: #00f2fe; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .top-navbar .user-profile { background: rgba(0, 242, 254, 0.1); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(0, 242, 254, 0.3); font-size: 13px; font-weight: 500; color: #00f2fe; }
+
+        .container { max-width: 600px; margin: 25px auto; padding: 0 15px; box-sizing: border-box; }
+        
+        /* Premium Dashboard Widgets */
+        .info-card { background: #1a1b24; padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #282a36; box-shadow: 0 8px 20px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
+        .info-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: linear-gradient(to bottom, #0072ff, #00f2fe); }
+        .info-card h3 { margin: 0 0 5px 0; font-size: 14px; color: #8a99ad; font-weight: 500; text-transform: uppercase; }
+        .info-card .value { font-size: 28px; font-weight: 700; color: #38ef7d; }
+
+        h2, h4 { color: #ffffff; font-weight: 600; margin-top: 0; margin-bottom: 15px; }
+        .accent-color { color: #00f2fe; }
+
+        /* Form Components */
+        label { font-weight: 500; display: block; margin: 15px 0 6px; color: #8a99ad; font-size: 13px; }
+        select, input, textarea { width: 100%; padding: 14px; background: #13141c; border: 1px solid #282a36; border-radius: 10px; color: white; box-sizing: border-box; font-size: 14px; font-family: inherit; transition: all 0.3s; }
+        select:focus, input:focus, textarea:focus { border-color: #00f2fe; outline: none; box-shadow: 0 0 10px rgba(0,242,254,0.2); }
+        
+        .btn { background: linear-gradient(45deg, #0072ff, #00f2fe); color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-size: 15px; cursor: pointer; margin-top: 20px; font-weight: 600; text-align: center; text-decoration: none; display: block; box-sizing: border-box; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,114,255,0.3); }
+        .btn:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,114,255,0.4); }
+        .btn-whatsapp { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 4px 15px rgba(56,239,125,0.3); }
+
+        .alert { background-color: rgba(56, 239, 125, 0.15); color: #38ef7d; padding: 14px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; border: 1px solid rgba(56, 239, 125, 0.3); font-size: 14px; }
+        .alert-danger { background-color: rgba(244, 67, 54, 0.15); color: #f44336; border-color: rgba(244, 67, 54, 0.3); }
+
+        /* Modern Table Styling */
+        .table-wrapper { background: #1a1b24; border-radius: 14px; border: 1px solid #282a36; overflow: hidden; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; box-sizing: border-box; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #282a36; font-size: 13px; }
+        th { background-color: #13141c; color: #8a99ad; font-weight: 500; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: #282a36; color: #fff; text-transform: uppercase; }
+        .badge-pending { background: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); }
+
+        /* Fixed Premium Bottom Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #13141c; height: 65px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #282a36; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); z-index: 1000; }
+        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a99ad; text-decoration: none; font-size: 11px; font-weight: 500; transition: 0.3s; flex: 1; height: 100%; gap: 4px; }
+        .bottom-nav-item.active { color: #00f2fe; }
+        .bottom-nav-item svg { width: 22px; height: 22px; fill: currentColor; }
+    </style>
+</head>
+<body>
+    <div class="top-navbar">
+        <a href="/" class="logo">⚡ BoostSMM</a>
+        <div class="user-profile">👤 abhiahek3376</div>
+    </div>
+    <div class="container">
+"""
+
+BASE_LAYOUT_END = """
+    </div>
+    <div class="bottom-nav">
+        <a href="/" class="bottom-nav-item {{ 'active' if active_page == 'order' else '' }}">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            New Order
+        </a>
+        <a href="/add-funds" class="bottom-nav-item {{ 'active' if active_page == 'funds' else '' }}">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            Top Up
+        </a>
+        <a href="/child-panel" class="bottom-nav-item {{ 'active' if active_page == 'child' else '' }}">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+            Child Panel
+        </a>
+        <a href="/affiliate" class="bottom-nav-item {{ 'active' if active_page == 'affiliate' else '' }}">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Affiliate
+        </a>
+        <a href="/tickets" class="bottom-nav-item {{ 'active' if active_page == 'tickets' else '' }}">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+            Support
+        </a>
+    </div>
+</body>
+</html>
 """
 
 @app.route('/')
@@ -64,54 +127,42 @@ def user_dashboard():
         css_class = "alert alert-danger" if msg_type == "danger" else "alert"
         alert_html = f"<div class='{css_class}'>{msg}</div>"
 
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Boost SMM Panel - Dashboard</title>{BASE_CSS}</head>
-    <body>
-        <div class="navbar">
-            <a href="/" class="logo">🚀 Boost SMM</a>
-            <div class="links">
-                <a href="/" class="active">New Order</a>
-                <a href="/add-funds">Add Funds</a>
-                <a href="/child-panel">Child Panel</a>
-                <a href="/affiliate">Affiliate</a>
-                <a href="/tickets">Tickets</a>
-                <a href="/admin">Admin Area</a>
-            </div>
-        </div>
-        <div class="container">
-            {alert_html}
-            <div class="wallet-box">
-                <span style="color: #8a99ad; font-weight: 500;">👋 Welcome User</span>
-                <span>Wallet Balance: <strong style="color: #38ef7d; font-size: 18px;">₹{user_wallet:.2f}</strong></span>
-            </div>
-            <h2>🔥 Place New Order</h2>
-            <form action="/place-order" method="POST">
-                <label>Select Service:</label>
-                <select name="service_id">
-                    {"".join([f"<option value='{s['id']}'>{s['name']} - ₹{s['rate']}/k</option>" for s in services])}
-                </select>
-                <label>Target Link:</label>
-                <input type="text" name="link" placeholder="https://instagram.com/username..." required>
-                <label>Quantity:</label>
-                <input type="number" name="quantity" min="100" placeholder="Min: 100" required>
-                <button type="submit" class="btn">Submit Order</button>
-            </form>
-            
-            <h3 style="margin-top: 40px;">📦 Recent Orders</h3>
-            <table>
-                <thead>
-                    <tr><th>Order ID</th><th>Link</th><th>Quantity</th><th>Status</th></tr>
-                </thead>
-                <tbody>
-                    {"".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-pending'>{o['status']}</span></td></tr>" for o in orders[::-1]]) if orders else "<tr><td colspan='4' style='text-align:center; color:#8a99ad;'>No orders placed yet.</td></tr>"}
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    """)
+    content = f"""
+    {alert_html}
+    <div class="info-card">
+        <h3>⚡ Wallet Balance</h3>
+        <div class="value">₹{user_wallet:.2f}</div>
+    </div>
+    
+    <h2>📦 Place New Order</h2>
+    <form action="/place-order" method="POST">
+        <label>Category Services:</label>
+        <select name="service_id">
+            {"".join([f"<option value='{s['id']}'>{s['name']} - ₹{s['rate']}/k</option>" for s in services])}
+        </select>
+        
+        <label>Link / Target URL:</label>
+        <input type="text" name="link" placeholder="e.g. https://instagram.com/profile" required>
+        
+        <label>Quantity:</label>
+        <input type="number" name="quantity" min="100" placeholder="Min: 100" required>
+        
+        <button type="submit" class="btn">New Order</button>
+    </form>
+    
+    <h2 style="margin-top: 35px;">📋 Recent Transaction Logs</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Target URL</th><th>Qty</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {"".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-pending'>{o['status']}</span></td></tr>" for o in orders[::-1]]) if orders else "<tr><td colspan='4' style='text-align:center; color:#8a99ad; padding:20px;'>No orders recorded yet.</td></tr>"}
+            </tbody>
+        </table>
+    </div>
+    """
+    return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='order')
 
 @app.route('/place-order', methods=['POST'])
 def place_order():
@@ -129,10 +180,9 @@ def place_order():
     cost = (qty / 1000) * rate
     
     if user_wallet < cost:
-        return redirect(url_for('user_dashboard', msg="Insufficient Funds! Please add money to your wallet.", type="danger"))
+        return redirect(url_for('user_dashboard', msg="Insufficient Wallet Funds! Please add money.", type="danger"))
         
     user_wallet -= cost
-    
     total_referred_spend += cost
     if total_referred_spend >= 500:
         affiliate_balance = total_referred_spend * 0.02
@@ -144,7 +194,7 @@ def place_order():
         "quantity": qty,
         "status": "Pending"
     })
-    return redirect(url_for('user_dashboard', msg=f"🎉 Order #{order_id} placed successfully!"))
+    return redirect(url_for('user_dashboard', msg=f"🎉 Order #{order_id} successfully queued!"))
 
 @app.route('/add-funds', methods=['GET', 'POST'])
 def add_funds():
@@ -161,132 +211,103 @@ def add_funds():
             amount = 0.0
 
         if amount <= 0:
-            msg_html = "<div class='alert alert-danger'>❌ Please enter a valid payment amount.</div>"
+            msg_html = "<div class='alert alert-danger'>❌ Please input a valid deposit amount.</div>"
         elif not ref_id:
-            msg_html = "<div class='alert alert-danger'>❌ Transaction ID / UTR cannot be empty.</div>"
+            msg_html = "<div class='alert alert-danger'>❌ Transaction ID reference hash required.</div>"
         elif ref_id in used_utrs:
-            msg_html = "<div class='alert alert-danger'>❌ Error: This Transaction ID has already been used!</div>"
+            msg_html = "<div class='alert alert-danger'>❌ Error: Duplicate Transaction ID detected!</div>"
         else:
             if method == "upi" and (len(ref_id) != 12 or not ref_id.isdigit()):
-                msg_html = "<div class='alert alert-danger'>❌ Invalid UPI UTR! Must be exactly 12 digits.</div>"
+                msg_html = "<div class='alert alert-danger'>❌ Invalid UTR structural signature. Must be 12 digits.</div>"
             else:
                 used_utrs.add(ref_id)
                 user_wallet += amount
-                msg_html = f"<div class='alert'>🎉 Payment submitted! ₹{amount:.2f} credited instantly via {method.upper()}.</div>"
+                msg_html = f"<div class='alert'>🎉 Payment verified! Instantly credited ₹{amount:.2f} via {method.upper()}.</div>"
 
     upi_id = "shiladevi0445@nyes"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa={upi_id}%26pn=Boost%20SMM%20Panel"
 
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Add Funds - Payment Gateway</title>{BASE_CSS}</head>
-    <body>
-        <div class="navbar">
-            <a href="/" class="logo">🚀 Boost SMM</a>
-            <div class="links"><a href="/">New Order</a><a href="/add-funds" class="active">Add Funds</a><a href="/child-panel">Child Panel</a></div>
-        </div>
-        <div class="container" style="text-align: center;">
-            <h2>💳 Multi-Method Payment Gateway</h2>
-            {msg_html}
-            
-            <div style="margin-bottom: 25px; background: #13141c; padding: 15px; border-radius: 8px; border: 1px solid #343746; text-align: left;">
-                <h4 style="margin: 0 0 10px 0; color: #00f2fe;">📋 Merchant Payment Addresses:</h4>
-                <p style="margin: 4px 0; font-size: 14px;"><strong>🇮🇳 UPI ID:</strong> {upi_id}</p>
-                <p style="margin: 4px 0; font-size: 14px;"><strong>🪙 USDT (TRC-20):</strong> TX7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
-                <p style="margin: 4px 0; font-size: 14px;"><strong>🪙 USDT (BEP-20) & ETH:</strong> 0x7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
-                <p style="margin: 4px 0; font-size: 14px;"><strong>🪙 BTC (Bitcoin):</strong> 1Axxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
-            </div>
+    content = f"""
+    <h2>💳 Automatic Fund Injection</h2>
+    {msg_html}
+    
+    <div style="background: #1a1b24; padding: 15px; border-radius: 12px; border: 1px solid #282a36; text-align: left; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #00f2fe;">🪙 Multi-Currency Vault Gateways:</h4>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>🇮🇳 Fast UPI Address:</strong> {upi_id}</p>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>🟢 USDT (TRC-20 Network):</strong> TX7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+        <p style="margin: 4px 0; font-size: 13px;"><strong>🔵 USDT (BEP-20 / Smart Chain):</strong> 0x7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+    </div>
 
-            <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-bottom: 20px;">
-                <img src="{qr_url}" alt="UPI QR Code">
-            </div>
-            
-            <form method="POST" style="text-align: left; max-width: 420px; margin: 0 auto;">
-                <label>Select Payment Method:</label>
-                <select name="method">
-                    <option value="upi">UPI (PhonePe/Paytm/GPay)</option>
-                    <option value="paypal">PayPal / Credit Card</option>
-                    <option value="crypto">Crypto (USDT TRC20/BEP20/BTC)</option>
-                </select>
-                
-                <label>Exact Amount Paid (₹ / $):</label>
-                <input type="number" step="any" name="amount" placeholder="e.g. 500" required>
-                
-                <label>Transaction ID / UTR Hash:</label>
-                <input type="text" name="ref_id" placeholder="Enter 12-digit UTR or TxID Hash" required>
-                
-                <button type="submit" class="btn">Verify & Credit Instantly</button>
-            </form>
-        </div>
-    </body>
-    </html>
-    """)
+    <div style="background: white; padding: 15px; display: inline-block; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); margin-bottom: 25px;">
+        <img src="{qr_url}" alt="Gateway QR Code" style="display:block;">
+    </div>
+    
+    <form method="POST" style="text-align: left;">
+        <label>Deposit Network Engine:</label>
+        <select name="method">
+            <option value="upi">PhonePe-Paytm (India Only) - Instant</option>
+            <option value="paypal">PayPal Gateway / International Card</option>
+            <option value="crypto">Crypto Network Cascade (USDT / BTC)</option>
+        </select>
+        
+        <label>Exact Transaction Amount:</label>
+        <input type="number" step="any" name="amount" placeholder="e.g. 500" required>
+        
+        <label>UTR Reference ID / TxID String:</label>
+        <input type="text" name="ref_id" placeholder="Enter 12-digit UTR or Payment ID" required>
+        
+        <button type="submit" class="btn">Verify & Load Wallet</button>
+    </form>
+    """
+    return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='funds')
 
 @app.route('/child-panel')
 def child_panel():
     whatsapp_url = "https://wa.me/918376820445?text=I%20need%20child%20pannel"
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Make Your Child Panel</title>{BASE_CSS}</head>
-    <body>
-        <div class="navbar">
-            <a href="/" class="logo">🚀 Boost SMM</a>
-            <div class="links"><a href="/">New Order</a><a href="/child-panel" class="active">Child Panel</a><a href="/tickets">Tickets</a></div>
-        </div>
-        <div class="container">
-            <h2>🛠️ Make Your Own SMM Panel (Child Panel)</h2>
-            <p style="color: #8a99ad; margin-bottom: 25px;">Apna logo laga kar apna khud ka brand aur automated business shuru karein.</p>
-            
-            <div class="card">
-                <h3 style="margin-bottom:5px;">📅 Monthly Plan</h3>
-                <p style="font-size: 26px; font-weight: bold; margin: 5px 0; color:#38ef7d;">₹{prices['child_panel_monthly']} <span style="font-size: 14px; color:#8a99ad; font-weight:normal;">/ Month</span></p>
-            </div>
-            
-            <div class="card" style="border-left-color: #38ef7d; background: linear-gradient(135deg, #13141c 0%, #1a2721 100%);">
-                <h3 style="margin-bottom:5px; color:#38ef7d;">🌟 Yearly Plan (Best Savings!)</h3>
-                <p style="font-size: 26px; font-weight: bold; margin: 5px 0; color:#00f2fe;">₹{prices['child_panel_yearly']} <span style="font-size: 14px; color:#8a99ad; font-weight:normal;">/ Year</span></p>
-            </div>
-            
-            <a href="{whatsapp_url}" target="_blank" class="btn btn-whatsapp">💬 Order via WhatsApp</a>
-        </div>
-    </body>
-    </html>
-    """)
+    content = f"""
+    <h2>🛠️ White-Label Reseller Platform (Child Panel)</h2>
+    <p style="color: #8a99ad; margin-bottom: 25px; font-size: 14px;">Establish your independent customized SMM identity linked directly to our automated pipeline.</p>
+    
+    <div class="info-card" style="margin-bottom: 15px;">
+        <h3 style="color: #38ef7d;">📅 Regular Rolling Plan</h3>
+        <div class="value" style="color: #ffffff; font-size: 24px;">₹{prices['child_panel_monthly']}<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Month</span></div>
+    </div>
+    
+    <div class="info-card" style="background: linear-gradient(135deg, #1a1b24 0%, #152722 100%); border-color: #38ef7d;">
+        <h3 style="color: #00f2fe;">🌟 Infinite Annual Engine</h3>
+        <div class="value" style="color: #38ef7d; font-size: 24px;">₹{prices['child_panel_yearly']}<span style="font-size:14px; color:#8a99ad; font-weight:normal;"> / Year</span></div>
+        <p style="color: #38ef7d; font-size: 12px; font-weight: 600; margin: 8px 0 0 0;">🔥 Flat 15% System Discount Built-in!</p>
+    </div>
+    
+    <a href="{whatsapp_url}" target="_blank" class="btn btn-whatsapp">💬 Synchronize via WhatsApp</a>
+    """
+    return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='child')
 
 @app.route('/affiliate')
 def affiliate():
-    status_msg = "🔴 Locked (Aapke referral ne abhi tak total ₹500 spend nahi kiya hai)"
+    status_msg = "🔒 Locked (Minimum referral trigger set at ₹500 spend threshold)"
     status_color = "#ff9800"
     if total_referred_spend >= 500:
-        status_msg = "🟢 Active & Unlocked (2% Commission Available!)"
+        status_msg = "🔓 Unlocked & Processing (2% Pipelined Commission Active)"
         status_color = "#38ef7d"
         
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Affiliate & Earn</title>{BASE_CSS}</head>
-    <body>
-        <div class="navbar">
-            <a href="/" class="logo">🚀 Boost SMM</a>
-            <div class="links"><a href="/">New Order</a><a href="/affiliate" class="active">Affiliate</a></div>
-        </div>
-        <div class="container">
-            <h2>🔗 Affiliate & Referral Program</h2>
-            <div class="card">
-                <label>Your Unique Referral Link:</label>
-                <input type="text" value="https://boost-smm.onrender.com/?ref=user8376" readonly style="color:#00f2fe; font-weight:bold; cursor:pointer;">
-            </div>
-            <div class="card" style="border-left-color: {status_color};">
-                <h3>💰 Affiliate Wallet Balance: <span style="color:#38ef7d;">₹{affiliate_balance:.2f}</span></h3>
-                <p style="margin: 10px 0 5px;">Referral Total Spend Progress: <strong>₹{total_referred_spend:.2f} / ₹500.00</strong></p>
-                <p style="margin: 0; font-size:14px;">Program Status: <span style="font-weight:bold; color: {status_color};">{status_msg}</span></p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """)
+    content = f"""
+    <h2>👥 Performance Affiliate Node</h2>
+    <p style="color: #8a99ad; font-size: 14px;">Distribute your dedicated referral token and absorb a rolling 2% processing revenue cut on global client spending.</p>
+    
+    <div class="info-card">
+        <h3>🔗 Cryptographic Token Link</h3>
+        <input type="text" value="https://boostsmm.onrender.com/?ref=abhiahek3376" readonly style="color:#00f2fe; font-weight:600; cursor:pointer; background:#13141c; text-align:center;">
+    </div>
+    
+    <div class="info-card" style="border-left-color: {status_color};">
+        <h3>💰 Vault Ledger Revenue</h3>
+        <div class="value" style="color: #38ef7d; margin-bottom: 10px;">₹{affiliate_balance:.2f}</div>
+        <p style="margin: 5px 0; font-size:13px;">Pipelined Spend Volume: <strong>₹{total_referred_spend:.2f} / ₹500.00</strong></p>
+        <p style="margin: 0; font-size:12px; color: {status_color}; font-weight:600;">System Check: {status_msg}</p>
+    </div>
+    """
+    return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='affiliate')
 
 @app.route('/tickets', methods=['GET', 'POST'])
 def tickets_page():
@@ -297,35 +318,26 @@ def tickets_page():
             "id": len(tickets) + 1,
             "subject": subject,
             "msg": message,
-            "reply": "Waiting for admin review..."
+            "reply": "System Route: Forwarded to Admin Cluster Review."
         })
-    tickets_html = "".join([f"<div class='card'><h4>📌 Ticket #{t['id']}: {t['subject']}</h4><p style='color:#ccc; font-size:14px;'>{t['msg']}</p><p style='color: #00f2fe; margin:5px 0 0; font-size:13px; font-weight:bold;'>💬 Admin Response: {t['reply']}</p></div>" for t in tickets[::-1]])
+    tickets_html = "".join([f"<div class='info-card'><h4>📌 Ticket #{t['id']}: {t['subject']}</h4><p style='color:#ccc; font-size:13px; margin:5px 0;'>{t['msg']}</p><p style='color: #00f2fe; margin:5px 0 0; font-size:12px; font-weight:600;'>💬 Node Reply: {t['reply']}</p></div>" for t in tickets[::-1]])
     
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Support Tickets</title>{BASE_CSS}</head>
-    <body>
-        <div class="navbar">
-            <a href="/" class="logo">🚀 Boost SMM</a>
-            <div class="links"><a href="/">New Order</a><a href="/tickets" class="active">Tickets</a></div>
-        </div>
-        <div class="container">
-            <h2>📩 Support Helpdesk</h2>
-            <form method="POST">
-                <label>Issue Subject:</label>
-                <input type="text" name="subject" placeholder="e.g. Order Pending, Fund not added" required>
-                <label>Detailed Message:</label>
-                <textarea name="message" rows="4" placeholder="Explain your query clearly..." required></textarea>
-                <button type="submit" class="btn">Open Ticket</button>
-            </form>
-            <hr style='margin-top:40px; border-color:#343746;'>
-            <h3>My Open Tickets</h3>
-            {tickets_html if tickets else "<p style='color:#8a99ad;'>No support tickets found.</p>"}
-        </div>
-    </body>
-    </html>
-    """)
+    content = f"""
+    <h2>📩 Encrypted Support Desk</h2>
+    <form method="POST">
+        <label>Node Issue Context:</label>
+        <input type="text" name="subject" placeholder="e.g. Transaction Routing Delay" required>
+        
+        <label>Extended Transmission Core:</label>
+        <textarea name="message" rows="4" placeholder="Describe the structural error or deployment context..." required></textarea>
+        
+        <button type="submit" class="btn">Transmit Core Ticket</button>
+    </form>
+    <hr style='margin: 30px 0; border: none; border-top: 1px solid #282a36;'>
+    <h2>📜 Historical Logs</h2>
+    {tickets_html if tickets else "<p style='color:#8a99ad; font-size:13px;'>No communications records registered.</p>"}
+    """
+    return render_template_string(BASE_LAYOUT_START + content + BASE_LAYOUT_END, active_page='tickets')
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
@@ -335,12 +347,12 @@ def admin_login():
             return redirect(url_for('admin_dashboard'))
     return render_template_string(f"""
     <!DOCTYPE html>
-    <html><head><title>Admin Login</title>{BASE_CSS}</head><body><div class="container" style="max-width:400px; margin-top:100px;">
-        <h2>🔐 Admin Control Sign-In</h2>
+    <html><head><title>Secure Login</title>{BASE_LAYOUT_START}</head><body><div class="container" style="max-width:400px; margin-top:80px;">
+        <h2>🔐 Control Module</h2>
         <form method="POST">
-            <label>Admin Username:</label><input type="text" name="username" required>
-            <label>Admin Password:</label><input type="password" name="password" required>
-            <button type="submit" class="btn">Login</button>
+            <label>Master Username:</label><input type="text" name="username" required>
+            <label>Master Password:</label><input type="password" name="password" required>
+            <button type="submit" class="btn">Initialize Node</button>
         </form>
     </div></body></html>
     """)
@@ -348,49 +360,8 @@ def admin_login():
 @app.route('/admin/dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if not session.get('admin_logged'): return redirect(url_for('admin_login'))
-    
     if request.method == 'POST':
         prices['child_panel_monthly'] = int(request.form.get('monthly', prices['child_panel_monthly']))
         prices['child_panel_yearly'] = int(request.form.get('yearly', prices['child_panel_yearly']))
         
-    orders_html = "".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-success'>{o['status']}</span></td></tr>" for o in orders])
-    
-    return render_template_string(f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Admin Dashboard</title>{BASE_CSS}</head>
-    <body>
-        <div class="navbar" style="background:#13141c;">
-            <span style="color:#38ef7d; font-weight:bold;">👑 Master Admin Panel</span>
-            <div class="links"><a href="/admin/logout">Logout</a></div>
-        </div>
-        <div class="container">
-            <h2>⚙️ Dynamic Child Panel Pricing Management</h2>
-            <form method="POST">
-                <label>Set Monthly Price (₹):</label>
-                <input type="number" name="monthly" value="{prices['child_panel_monthly']}">
-                <label>Set Yearly Price (₹):</label>
-                <input type="number" name="yearly" value="{prices['child_panel_yearly']}">
-                <button type="submit" class="btn" style="background:#38ef7d;">Save & Update Rates</button>
-            </form>
-            
-            <h2 style='margin-top:45px;'>📦 Live Customer Orders Logs</h2>
-            <table>
-                <thead><tr><th>ID</th><th>Target URL</th><th>Qty</th><th>Status</th></tr></thead>
-                <tbody>
-                    {orders_html if orders else "<tr><td colspan='4' style='text-align:center; color:#8a99ad;'>No user orders recorded yet.</td></tr>"}
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    """)
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged', None)
-    return redirect(url_for('admin_login'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
-    
+    orders_html = "".join([f"<tr><td>#{o['id']}</td><td>{o['link']}</td><td>{o['quantity']}</td><td><span class='badge badge-success'>{o['status']}</span></td></tr>" for
